@@ -2,6 +2,6 @@
 unlink a.dat
 while true
 do
-	sudo ./old
+	sudo ./dht11
 	sleep 1
 done
