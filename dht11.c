@@ -1,34 +1,30 @@
 /******************************************************************************
-NAME:Sensor DHT11's driver
-AUTHOR:Thinkelreo
-VERSION:V1.0
+NAME:DHT_11's driver
+VERSION:V1.2
 DATE:2016.11.12
+AUHOR:Thikerleo
 ******************************************************************************/
 
-#include<stdio.h>
+
+
 #include<wiringPi.h>
-#include<stdint.h>
+#include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-
-#define GPIO_PIN 0
 
 typedef struct {
 	int TEMP;
 	int RH;
 }dht_data;
 
-uint8_t dht11[] = {0, 0, 0, 0, 0};
-int	laststate = HIGH;
-int	counter = 0;
-int i = 0;
-int j = 0;
-
-FILE * fp;
-
-int
-main()
+dht_data* dht_get(int GPIO_PIN)
 {
+	int8_t dht11[] = {0, 0, 0, 0, 0};
+	int	laststate = HIGH;
+	int	counter = 0;
+	int i = 0;
+	int j = 0;
+	
 	dht_data* t  = (dht_data*)malloc(sizeof(dht_data));
 	wiringPiSetup();
 	pinMode(GPIO_PIN, OUTPUT);
@@ -38,10 +34,6 @@ main()
 	delayMicroseconds(40);
 	pinMode(GPIO_PIN, INPUT);
 	
-	fp = open("a.dat",  )
-
-	while(1)
-	{
 		for(i = 0; i < 85; i++)
 		{
 			counter = 0;
@@ -66,24 +58,30 @@ main()
 				}	
 				j++;
 			}
-		}			
+		}		
 		if( (j >= 4)  && (dht11[4] == dht11[0] + dht11[1] + dht11[2]+dht11[3]))
 		{
 			t->TEMP = dht11[2];
 			t->RH = dht11[0];
-			printf("TEMP: %d, RH: %d", t->TEMP, t->RH);
-			if((fp = fopen("a.dat", "a+")) == NULL)
-			{
-				printf("OPEN FILE ERROR\n");	
-				return -1;
-			}
-			system("date >> a.dat");
-			fprintf(fp, "TEMP: %d, RH: %d\n", t->TEMP, t->RH);
+			return  t;	
 		}
 		else
 		{
 			printf("Broken data\n");
+			exit(-1);
 		}
-		sleep(2);
-	}
+}      
+
+int main(int argc, char** argv)
+{
+	FILE *fp;
+	dht_data*  a;
+	a = dht_get(1);	
+	printf("TEMP:%d\n", a->TEMP);
+	printf("RH:%d\n", a->RH);
+	system("date >> a.dat");
+	fp = fopen("a.dat", "a+");
+	fprintf(fp, "TEMP:%d\nRH:%d\n", a->TEMP, a->RH);
+	fclose(fp);
+	return 0;
 }
